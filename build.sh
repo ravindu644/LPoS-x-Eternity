@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export MODEL=$1
+export piss=$2
 export BUILD_CROSS_COMPILE=$(pwd)/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-androidkernel-
 export BUILD_JOB_NUMBER=`grep -c ^processor /proc/cpuinfo`
 RDIR=$(pwd)
@@ -46,6 +47,7 @@ d2x)
     SOC=9825
     BOARD=SRPSC14C007KU
 ;;
+
 *)
     echo "Unknown device: $MODEL setting to beyond2lte"
     KERNEL_DEFCONFIG=exynos9820-beyond2lte_defconfig
@@ -96,7 +98,7 @@ FUNC_BUILD_RAMDISK()
     rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9820
     rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9825
 
-    cp $RDIR/ramdisk/fstab.exynos$SOC $RDIR/ramdisk/ramdisk/
+    cp $RDIR/ramdisk/fstab.exynos$SOC$piss $RDIR/ramdisk/ramdisk/fstab.exynos$SOC
 
     cd $RDIR/ramdisk/
     ./repackimg.sh --nosudo
@@ -118,7 +120,7 @@ FUNC_BUILD_ZIP()
     cp $RDIR/toolchains/updater-script $RDIR/build/zip/META-INF/com/google/android/
     cp $RDIR/toolchains/update-binary $RDIR/build/zip/META-INF/com/google/android/
     cd $RDIR/build/zip
-    zip -r ../kernel_$MODEL.zip .
+    zip -r ../kernel_$MODEL$piss.zip .
     rm -rf $RDIR/build/zip
     cd $RDIR/build
 }
