@@ -62,6 +62,13 @@ FUNC_BUILD_KERNEL()
     export PLATFORM_VERSION=11
     export ANDROID_MAJOR_VERSION=r
 
+    if [ -n "$piss" ]; then
+    echo "Building with N variant tzdev"
+    rm -r drivers/misc/tzdev
+    cp -r BTStzdev drivers/misc/tzdev
+    sleep 5
+    fi
+
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
         CROSS_COMPILE=$BUILD_CROSS_COMPILE \
         $KERNEL_DEFCONFIG || exit -1
