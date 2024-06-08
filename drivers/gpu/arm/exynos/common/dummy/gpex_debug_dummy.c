@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+// SPDX-License-Identifier: GPL-2.0
 
 /*
  * (C) COPYRIGHT 2021 Samsung Electronics Inc. All rights reserved.
@@ -18,17 +18,55 @@
  * http://www.gnu.org/licenses/gpl-2.0.html.
  */
 
-#ifndef _GPEXBE_POWER_CYCLE_WA_H_
-#define _GPEXBE_POWER_CYCLE_WA_H_
+/* Implements */
+#include <gpex_debug.h>
 
-#include <mali_kbase.h>
+int gpex_debug_init(struct device **dev)
+{
+	return 0;
+}
 
-u32 gpexbe_power_cycle_wa_get_reset_ticks(void);
-u32 gpexbe_power_cycle_wa_get_hard_stop_ticks(void);
-void gpexbe_power_cycle_wa_set_hard_stopped(void);
-bool gpexbe_power_cycle_wa_is_hard_stopped(void);
-void gpexbe_power_cycle_wa_clear_hard_stopped(void);
+void gpex_debug_dump_hist(enum hist_type ht)
+{
+	return;
+}
 
-void gpexbe_power_cycle_wa_execute_dummy_job(struct kbase_device *kbdev, u64 cores);
+void gpex_debug_new_record(enum hist_type ht)
+{
+	return;
+}
 
-#endif /* _GPEXBE_POWER_CYCLE_WA_H_ */
+void gpex_debug_record_time(enum hist_type ht)
+{
+	return;
+}
+
+void gpex_debug_record_prev_data(enum hist_type ht, int prev_data)
+{
+	return;
+}
+
+void gpex_debug_record_new_data(enum hist_type ht, int new_data)
+{
+	return;
+}
+
+void gpex_debug_record_code(enum hist_type ht, int code)
+{
+	return;
+}
+
+void gpex_debug_record(enum hist_type ht, int prev_data, int new_data, int code)
+{
+	return;
+}
+
+void gpex_debug_incr_error_cnt(enum hist_type ht)
+{
+	return;
+}
+
+void gpex_debug_dump_error_cnt(void)
+{
+	return;
+}
