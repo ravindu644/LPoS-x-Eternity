@@ -108,7 +108,7 @@ config MALI_DMA_FENCE
 	  support for DMA_BUF fences.
 
 config MALI_ARBITER_SUPPORT
-	bool "Enable arbiter support for Mali"
+	tristate "Enable arbiter support for Mali"
 	depends on MALI_MIDGARD && !MALI_CSF_SUPPORT
 	default n
 	help
