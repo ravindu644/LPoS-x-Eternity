@@ -71,7 +71,7 @@ FUNC_BUILD_KERNEL()
 
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
         CROSS_COMPILE=$BUILD_CROSS_COMPILE \
-        $KERNEL_DEFCONFIG || exit -1
+        $KERNEL_DEFCONFIG eternity.config || exit -1
 
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
         CROSS_COMPILE=$BUILD_CROSS_COMPILE || exit -1
