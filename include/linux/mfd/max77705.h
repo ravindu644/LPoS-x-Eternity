@@ -34,42 +34,26 @@
 		((m) & 0x30 ? ((m) & 0x10 ? 4 : 5) : ((m) & 0x40 ? 6 : 7)))
 
 #if defined(CONFIG_MOTOR_DRV_MAX77705)
-	struct max77705_haptic_pdata {
-		u16 max_timeout;
-		u16 duty;
-		u16 period;
-		u16 reg2;
-		bool overdrive_state;
-		int gpio;
-		const char *regulator_name;
-		unsigned int pwm_id;
-		const char *vib_type;
-
-		/* for multi-frequency */
-		int multi_frequency;
-		int freq_num;
-		u32 *multi_freq_period;
-		int normal_ratio;
-		int overdrive_ratio;
-		int high_temp_ratio;
-		int temperature;
-	};
-#endif
-
-struct max77705_vibrator_pdata {
+struct max77705_haptic_pdata {
+	u16 max_timeout;
+	u16 duty;
+	u16 period;
+	u16 reg2;
+	bool overdrive_state;
 	int gpio;
 	char *regulator_name;
-	struct pwm_device *pwm;
-	const char *motor_type;
+	unsigned int pwm_id;
+	const char *vib_type;
 
-	int freq;
 	/* for multi-frequency */
-	int freq_nums;
-	u32 *freq_array;
-	u32 *ratio_array; /* not used now */
+	int multi_frequency;
+	int freq_num;
+	u32 *multi_freq_duty;
+	u32 *multi_freq_period;
 	int normal_ratio;
 	int overdrive_ratio;
 };
+#endif
 
 struct max77705_regulator_data {
 	int id;
@@ -83,14 +67,12 @@ struct max77705_platform_data {
 	int irq_gpio;
 	bool wakeup;
 	bool blocking_waterevent;
-	bool extra_fw_enable;
 	int wpc_en;
 	int fw_product_id;
 	struct muic_platform_data *muic_pdata;
 
 	int num_regulators;
 	struct max77705_regulator_data *regulators;
-	struct max77705_vibrator_pdata *vibrator_data;
 #if defined(CONFIG_MOTOR_DRV_MAX77705)
 	struct max77705_haptic_pdata *haptic_data;
 #endif
