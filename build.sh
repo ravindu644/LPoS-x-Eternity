@@ -63,7 +63,8 @@ FUNC_BUILD_KERNEL()
     export ANDROID_MAJOR_VERSION=r
 
     if [ -n "$piss" ]; then
-    echo "Building with N variant tzdev"
+    echo "Building with KOR tzdev"
+    echo "Make sure to 'git reset --hard HEAD' if you want to compile for INTL after this!"
     rm -r drivers/misc/tzdev
     cp -r BTStzdev drivers/misc/tzdev
     sleep 5
@@ -105,7 +106,7 @@ FUNC_BUILD_RAMDISK()
     rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9820
     rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9825
 
-    cp $RDIR/ramdisk/fstab.exynos$SOC$piss $RDIR/ramdisk/ramdisk/fstab.exynos$SOC
+    cp $RDIR/ramdisk/fstab.exynos$SOC $RDIR/ramdisk/ramdisk/fstab.exynos$SOC
 
     cd $RDIR/ramdisk/
     ./repackimg.sh --nosudo
