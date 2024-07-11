@@ -18,7 +18,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/sec_class.h>
 #include <linux/motor/sec_haptic.h>
-#include <kunit/mock.h>
+//#include <kunit/mock.h>
 
 #if defined(CONFIG_SSP_MOTOR_CALLBACK)
 #include <linux/ssp_motorcallback.h>
@@ -41,7 +41,7 @@ static int sec_get_temperature_duty_ratio(struct sec_haptic_drvdata *ddata)
 }
 #endif
 
-__visible_for_testing int sec_haptic_set_frequency(struct sec_haptic_drvdata *ddata,
+static int sec_haptic_set_frequency(struct sec_haptic_drvdata *ddata,
 	int num)
 {
 	int duty_ratio = ddata->ratio;
