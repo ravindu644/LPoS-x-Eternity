@@ -106,7 +106,7 @@ FUNC_BUILD_RAMDISK()
     rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9820
     rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9825
 
-    cp $RDIR/ramdisk/fstab.exynos$SOC $RDIR/ramdisk/ramdisk/fstab.exynos$SOC
+    cp $RDIR/ramdisk/fstab.exynos9820 $RDIR/ramdisk/ramdisk/fstab.exynos$SOC
 
     cd $RDIR/ramdisk/
     ./repackimg.sh --nosudo
