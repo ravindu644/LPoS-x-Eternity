@@ -1,0 +1,71 @@
+name: build and release
+
+on:
+  workflow_dispatch:
+    inputs:      
+      tag:
+        description: 'Release Tag'
+        required: true        
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        device: [beyond2lte, beyond1lte, beyond0lte, beyondx]
+        region: [international, korean]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install packages & setup
+        run: |
+          sudo apt update -y  
+          sudo apt install libncurses5-dev python2 libtinfo5 -y      
+          
+      - name: Set environment variable
+        run: |
+          echo "LPOS_KERNEL_VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          
+      - name: Building LPoS
+        run: |
+          if [ "${{ matrix.region }}" == "korean" ]; then
+            bash build.sh ${{ matrix.device }} -KOR
+          else
+            bash build.sh ${{ matrix.device }}
+          fi
+
+      - name: Upload kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: "LPoS-${{ env.LPOS_KERNEL_VERSION }}-${{ matrix.device }}-${{ matrix.region }}"
+          path: |
+            build/*.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.event.inputs.tag }}
+          name: "LPoS Kernel ${{ github.event.inputs.tag }}"
+          draft: false
+          prerelease: false
+          token: ${{ secrets.TOKEN }}          
+          artifacts: "artifacts/**/*.zip"
+          body: "Commit SHA: ${{ github.sha }}"

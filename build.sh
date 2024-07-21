@@ -75,7 +75,7 @@ FUNC_BUILD_KERNEL()
 
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
         CROSS_COMPILE=$BUILD_CROSS_COMPILE \
-        menuconfig || exit -1        
+        menuconfig || true      
 
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
         CROSS_COMPILE=$BUILD_CROSS_COMPILE || exit -1
@@ -131,7 +131,7 @@ FUNC_BUILD_ZIP()
     cp $RDIR/toolchains/updater-script $RDIR/build/zip/META-INF/com/google/android/
     cp $RDIR/toolchains/update-binary $RDIR/build/zip/META-INF/com/google/android/
     cd $RDIR/build/zip
-    zip -r ../kernel_$MODEL$piss.zip .
+    zip -r ../LPoS-x-Eternity-${LPOS_KERNEL_VERSION}-${MODEL}${piss}.zip .
     rm -rf $RDIR/build/zip
     cd $RDIR/build
 }
