@@ -75,6 +75,10 @@ FUNC_BUILD_KERNEL()
         $KERNEL_DEFCONFIG eternity.config || exit -1
 
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
+        CROSS_COMPILE=$BUILD_CROSS_COMPILE \
+        menuconfig || exit -1        
+
+    make -j$BUILD_JOB_NUMBER ARCH=arm64 \
         CROSS_COMPILE=$BUILD_CROSS_COMPILE || exit -1
 
     $RDIR/toolchains/mkdtimg cfg_create build/dtb_$SOC.img \
