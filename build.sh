@@ -88,13 +88,6 @@ FUNC_BUILD_KERNEL()
     echo " Finished kernel build"
 }
 
-FUNC_BUILD_DTBO()
-{
-    $RDIR/toolchains/mkdtimg cfg_create build/dtbo_$MODEL.img \
-        $RDIR/toolchains/configs/$MODEL.cfg \
-        -d $RDIR/arch/arm64/boot/dts/samsung
-}
-
 FUNC_BUILD_RAMDISK()
 {
     rm -f $RDIR/ramdisk/split_img/boot.img-kernel
@@ -127,7 +120,6 @@ FUNC_BUILD_ZIP()
     mkdir -p $RDIR/build/zip
     cp $RDIR/build/$MODEL-boot-ramdisk.img $RDIR/build/zip/boot.img
     cp $RDIR/build/dtb_$SOC.img $RDIR/build/zip/dtb.img
-    cp $RDIR/build/dtbo_$MODEL.img $RDIR/build/zip/dtbo.img
     mkdir -p $RDIR/build/zip/META-INF/com/google/android/
     cp $RDIR/toolchains/updater-script $RDIR/build/zip/META-INF/com/google/android/
     cp $RDIR/toolchains/update-binary $RDIR/build/zip/META-INF/com/google/android/
@@ -143,7 +135,6 @@ rm -rf ./build.log
 	START_TIME=`date +%s`
 
 	FUNC_BUILD_KERNEL
-	FUNC_BUILD_DTBO
 	FUNC_BUILD_RAMDISK
 	FUNC_BUILD_ZIP
 
