@@ -85,10 +85,10 @@ rm -rf ./build.log
 
     if [ "$KSU" = "non-ksu" ]; then
         echo "CONFIG_KSU=n" > "${RDIR}/arch/arm64/configs/ksu.config"
-        build_kernel "eternity.config ksu.config"
+        build_kernel "eternity.config ksu.config version.config"
     elif [ "$KSU" = "ksu" ]; then
         echo "CONFIG_KSU=y" > "${RDIR}/arch/arm64/configs/ksu.config"
-        build_kernel "eternity.config ksu.config"
+        build_kernel "eternity.config ksu.config version.config"
     else
         echo "Error: Invalid input. Please enter 'ksu' or 'non-ksu' as the 2nd parameter"
         exit 1
