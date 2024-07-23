@@ -43,7 +43,7 @@ jobs:
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
-          name: "LPoS-${{ env.LPOS_KERNEL_VERSION }}-${{ matrix.device }}-${{ matrix.su }}"
+          name: "LPoS-${{ env.LPOS_KERNEL_VERSION }}-${{ matrix.device }}-${{ matrix.su }}-universal"
           path: |
             build/*.zip
 
@@ -63,7 +63,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.inputs.tag }}
-          name: "LPoS Kernel ${{ github.event.inputs.tag }}"
+          name: "LPoS-x-Eternity-${{ github.event.inputs.tag }}"
           draft: false
           prerelease: false
           token: ${{ secrets.TOKEN }}          
