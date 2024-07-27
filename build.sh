@@ -1,10 +1,41 @@
 #!/bin/bash
-
+RDIR=$(pwd)
 export MODEL=$1
 export KSU=$2
-export BUILD_CROSS_COMPILE=$(pwd)/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-androidkernel-
-export BUILD_JOB_NUMBER=$(grep -c ^processor /proc/cpuinfo)
-RDIR=$(pwd)
+export KBUILD_BUILD_USER="@ravindu644"
+
+#proton-12
+if [ ! -d "${RDIR}/proton" ]; then
+    mkdir -p "${RDIR}/proton"
+    git clone --depth=1 https://github.com/ravindu644/proton-12.git -b main --single-branch proton
+fi
+
+export PATH=$PWD/proton/bin:$PATH
+export READELF=$PWD/proton/bin/aarch64-linux-gnu-readelf
+export LLVM=1
+export ARGS="
+CC=clang
+LD=ld.lld
+ARCH=arm64
+CROSS_COMPILE=aarch64-linux-gnu-
+CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+CLANG_TRIPLE=aarch64-linux-gnu-
+AR=llvm-ar
+NM=llvm-nm
+AS=llvm-as
+OBJCOPY=llvm-objcopy
+OBJDUMP=llvm-objdump
+OBJSIZE=llvm-size
+STRIP=llvm-strip
+LLVM_AR=llvm-ar
+LLVM_DIS=llvm-dis
+LLVM_NM=llvm-nm
+LLVM=1
+"
+#symlinking python2
+if [ ! -f "$HOME/python" ]; then
+    ln -s /usr/bin/python2.7 "$HOME/python"
+fi 
 
 # Device configuration
 declare -A DEVICES=(
@@ -36,9 +67,9 @@ build_kernel() {
     export PLATFORM_VERSION=11
     export ANDROID_MAJOR_VERSION=r
 
-    make -j$BUILD_JOB_NUMBER ARCH=arm64 CROSS_COMPILE=$BUILD_CROSS_COMPILE $KERNEL_DEFCONFIG $config || exit -1
-    make -j$BUILD_JOB_NUMBER ARCH=arm64 CROSS_COMPILE=$BUILD_CROSS_COMPILE menuconfig || true
-    make -j$BUILD_JOB_NUMBER ARCH=arm64 CROSS_COMPILE=$BUILD_CROSS_COMPILE || exit -1
+    make -j$(nproc) ARCH=arm64 ${ARGS} $KERNEL_DEFCONFIG $config || exit -1
+    make -j$(nproc) ARCH=arm64 ${ARGS} menuconfig || true
+    make -j$(nproc) ARCH=arm64 ${ARGS} || exit -1
 
     $RDIR/toolchains/mkdtimg cfg_create build/dtb_$SOC.img $RDIR/toolchains/configs/exynos$SOC.cfg -d $RDIR/arch/arm64/boot/dts/exynos
     echo "Finished kernel build"
