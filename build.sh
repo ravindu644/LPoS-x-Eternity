@@ -99,10 +99,8 @@ build_zip() {
     rm -rf $RDIR/build/zip
     mkdir -p $RDIR/build/zip
     cp $RDIR/build/$MODEL-boot-ramdisk.img $RDIR/build/zip/boot.img
-    cp $RDIR/build/dtb_$SOC.img $RDIR/build/zip/dtb.img
-    mkdir -p $RDIR/build/zip/META-INF/com/google/android/
-    cp $RDIR/toolchains/updater-script $RDIR/build/zip/META-INF/com/google/android/
-    cp $RDIR/toolchains/update-binary $RDIR/build/zip/META-INF/com/google/android/
+    cp $RDIR/build/dtb_$SOC.img $RDIR/build/zip/dt.img
+    cp -r "${RDIR}/toolchains/twrp_zip/"* "${RDIR}/build/zip/"
     cd $RDIR/build/zip
     zip -r ../LPoS-x-Eternity-${LPOS_KERNEL_VERSION}-${MODEL}-${KSU}-universal.zip .
     rm -rf $RDIR/build/zip

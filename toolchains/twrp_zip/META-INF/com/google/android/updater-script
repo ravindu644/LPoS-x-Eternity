@@ -1,0 +1,21 @@
+#-----------Dynamic Installer Configs-----------#
+#The #MAGISK tag is required, dont remove it
+#MAGISK
+setdefault run_addons off
+setdefault apex_mount off
+setdefault devices off
+#-----------------------------------------------#
+#Your script starts here:
+
+ui_print " "
+ui_print "*******************************"
+ui_print "*      - LPoS Kernel -        *"
+ui_print "*       TWRP Installer        *"
+ui_print "*      by @ravindu644         *"
+ui_print "*******************************"
+
+ui_print "[+] Installing Kernel..."
+package_extract_file boot.img "$(find_block boot)"
+ui_print "[+] Installing DT..."
+package_extract_file dt.img "$(find_block dtb)"
+ui_print "[!] Installation Completed !"
