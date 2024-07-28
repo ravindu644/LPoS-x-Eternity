@@ -1,0 +1,128 @@
+#!/sbin/sh
+#Dynamic Installer by @BlassGO
+#Also uses code from @osm0sis and @topjohnwu
+#SETUP
+ui_print() {
+  if ! $BOOTMODE; then
+     echo "ui_print $1
+       ui_print" >> $OUTFD
+  else 
+    echo "$1"
+  fi
+}
+abort() {
+   ui_print " " && ui_print "$*" && ui_print " "
+   exit 1
+}
+cleanup() {
+  #Remove only zbin plugins
+  ( rm -rf "$l" "$TMP/zbin"
+  rm -f \
+  "$bb" \
+  "$bs" \
+  "$TMP/bin" \
+  "$TMP/bin.xz" \
+  "$TMP/core"
+  ) 2>/dev/null
+}
+get() {
+  #Needed Busybox env
+  local inzip outzip
+  unzip -p -o "$installzip" "META-INF/zbin/$1" > "$2/$1"
+  inzip=$(unzip -l "$installzip" "META-INF/zbin/$1" | grep "META-INF/zbin/$1" | awk '{print $1}')
+  outzip=$(stat -c%s "$2/$1")
+  [[ "$inzip" != "$outzip" ]] && abort "ERROR: Bad extraction: $1"
+  chmod 755 "$2/$1"
+}
+ensure_get() {
+  local root="META-INF/zbin/$1"
+  unzip -o "$installzip" "$root" -d "$2" >&2
+  if [ -f "$2/$root" ]; then
+     mv -f "$2/$root" "$2/$1"
+     chmod 755 "$2/$1"
+     if [ -f "$2/$1" ]; then rm -rf "$2/${root%%/*}"
+     else abort "ERROR:2: Cant get $1"
+     fi
+  else abort "ERROR:1: Cant get $1"
+  fi
+}
+setup_bb() {
+   #Ensure /system/bin/sh
+   if [ ! -f /system/bin/sh ]; then
+      umount -l /system 2>/dev/null
+      mkdir -p /system/bin
+      ln -sf "$(command -v sh)" /system/bin/sh
+   fi
+   if [ -e "$bb" ]; then
+     if ! "$bb" --install -s "$l"; then
+        for i in $("$bb" --list); do
+          if ! ln -sf "$bb" "$l/$i" && ! "$bb" ln -sf "$bb" "$l/$i" && ! "$bb" ln -f "$bb" "$l/$i"; then
+            # create script wrapper if symlinking and hardlinking failed because of restrictive selinux policy
+            if ! echo "#!$bb" > "$l/$i" || ! chmod 755 "$l/$i"; then
+              abort "ERROR:1: Failed to setup busybox"
+            fi
+          fi
+        done
+     fi
+   else
+      abort "ERROR:2: Cant find busybox"
+   fi
+   if [ ! -f "$l/sh" ]; then abort "ERROR:3: Failed to setup busybox"; fi
+}
+setup() {
+  cleanup
+  mkdir -p "$l"
+  mkdir -p "$TMP/zbin"
+  if [[ ! -d "$l" || ! -d "$TMP/zbin" ]]; then
+    abort "ERROR: Cant startup"
+  fi
+  #First ensuring Busybox environment
+  ensure_get busybox "$TMP"
+  setup_bb
+  export PATH="$l:$PATH"
+  #Extra setup
+  get bash "$TMP"
+  get bin "$TMP"
+  get core "$TMP"
+  mv -f "$TMP/bin" "$TMP/bin.xz" >/dev/null 2>&1
+  xz -d "$TMP/bin.xz" >/dev/null 2>&1
+  if [ ! -f "$TMP/bin" ]; then abort "setup: Cant get bin"; fi;
+  unzip -qo "$TMP/bin" -d "$TMP/zbin" 
+  find "$TMP/zbin" -type f -exec mv -f {} "$l" \;
+  find "$l" -type f -exec chmod 755 {} +;
+  PATH="$PATH:/system/bin" "$bs" "$TMP/core" "$@"
+  if [[ "$?" == "130" ]]; then exit 1; else exit 0; fi
+}
+setenforce 0
+ps | grep zygote | grep -v grep >/dev/null && export BOOTMODE=true || export BOOTMODE=false
+$BOOTMODE || ps -A  | grep zygote | grep -v grep >/dev/null && export BOOTMODE=true
+if ! $BOOTMODE; then 
+   #Global vars
+   [ -d /tmp ] && export TMP=/tmp || export TMP=/dev/tmp
+   export TMPDIR="$TMP"
+   export OUTFD="/proc/self/fd/$2"
+   export installzip="$3"
+   export addons="$TMP/addons"
+   export l="$TMP/ugu"
+   cert=META-INF/zbin/version.txt
+   bb="$TMP/busybox"
+   bs="$TMP/bash"
+   setup
+else
+   umask 022
+   #Global vars
+   export TMP=/dev/tmp
+   export TMPDIR="$TMP"
+   export OUTFD="$2"
+   export ZIPFILE="$3"
+   export installzip="$3"
+   export DNM=META-INF/com/google/android/magisk
+   export PERSISTDIR=/sbin/.magisk/mirror/persist
+   export addons="$TMP/addons"
+   export l="$TMP/ugu"
+   cert=META-INF/zbin/version.txt
+   bb="$TMP/busybox"
+   bs="$TMP/bash"
+   setup
+fi
+ 
