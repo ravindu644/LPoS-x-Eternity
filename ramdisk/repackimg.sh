@@ -89,7 +89,6 @@ if [ -z "$(ls ramdisk/* 2>/dev/null)" ] && [ ! "$ramdiskcomp" = "empty" -a ! "$o
   exit 1;
 fi;
 
-clear;
 echo " ";
 echo "Android Image Kitchen - RepackImg Script";
 echo "by osm0sis @ xda-developers";
