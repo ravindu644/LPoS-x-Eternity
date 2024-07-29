@@ -194,6 +194,9 @@ obj-$(CONFIG_TEE)		+= tee/
 obj-$(CONFIG_MULTIPLEXER)	+= mux/
 obj-$(CONFIG_AINUR_DTS_SW) += dts_eagle/
 
+# Vibrator
+obj-y += vibrator/
+
 # CCIC
 obj-y	+= ccic/
 
