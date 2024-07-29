@@ -14,6 +14,19 @@ ui_print "*       TWRP Installer        *"
 ui_print "*      by @ravindu644         *"
 ui_print "*******************************"
 
+# Check bootloader version
+if [ "$(getprop ro.bootloader | cut -c 5)" = "N" ]; then
+    ui_print " "
+    ui_print "Korean Device Detected..."
+    ui_print "[+] Installing Korean DTBO..."    
+    package_extract_file dtbo_ks.img "$(find_block dtbo)"
+else
+    ui_print " "
+    ui_print "International Device Detected..."
+    ui_print "[+] Installing DTBO..."
+    package_extract_file dtbo.img "$(find_block dtbo)"
+fi
+
 ui_print "[+] Installing Kernel..."
 package_extract_file boot.img "$(find_block boot)"
 ui_print "[+] Installing DT..."

@@ -75,6 +75,24 @@ build_kernel() {
     echo "Finished kernel build"
 }
 
+build_dtbo()
+{
+    # Build for international variant
+    "${RDIR}/toolchains/mkdtimg" cfg_create "build/dtbo_${MODEL}.img" \
+        "${RDIR}/toolchains/configs/${MODEL}.cfg" \
+        -d "${RDIR}/arch/arm64/boot/dts/samsung"
+    
+    # Build for Korean variant only if the cfg file exists
+    if [ -f "${RDIR}/toolchains/configs/${MODEL}ks.cfg" ]; then
+        "${RDIR}/toolchains/mkdtimg" cfg_create "build/dtbo_${MODEL}ks.img" \
+            "${RDIR}/toolchains/configs/${MODEL}ks.cfg" \
+            -d "${RDIR}/arch/arm64/boot/dts/samsung"
+        echo "Korean DTBO image built successfully"
+    else
+        echo "Info: ${MODEL}ks.cfg not found. Skipping Korean DTBO build."
+    fi
+}
+
 build_ramdisk() {
     rm -f $RDIR/ramdisk/split_img/boot.img-kernel
     cp $RDIR/arch/arm64/boot/Image $RDIR/ramdisk/split_img/boot.img-kernel
@@ -100,6 +118,15 @@ build_zip() {
     mkdir -p $RDIR/build/zip
     cp $RDIR/build/$MODEL-boot-ramdisk.img $RDIR/build/zip/boot.img
     cp $RDIR/build/dtb_$SOC.img $RDIR/build/zip/dt.img
+
+    #INTL DTBO
+    cp "${RDIR}/build/dtbo_${MODEL}.img" "${RDIR}/build/zip/dtbo.img"
+
+    #KOR DTBO if exsits..
+    if [ -f "${RDIR}/build/dtbo_${MODEL}ks.img" ]; then
+        cp "${RDIR}/build/dtbo_${MODEL}ks.img" "${RDIR}/build/zip/dtbo_ks.img"
+    fi
+    
     cp -r "${RDIR}/toolchains/twrp_zip/"* "${RDIR}/build/zip/"
     cd $RDIR/build/zip
     zip -r ../LPoS-x-Eternity-${LPOS_KERNEL_VERSION}-${MODEL}-${KSU}-universal.zip .
@@ -123,6 +150,7 @@ rm -rf ./build.log
         exit 1
     fi
 
+    build_dtbo
     build_ramdisk
     build_zip
 
