@@ -1,0 +1,28 @@
+name: Build DTBO
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up environment
+        run: |
+          sudo apt update -y  
+          sudo apt install libncurses5-dev python2 libtinfo5 -y    
+
+      - name: Run build_dtbo.sh
+        run: ./build_dtbo.sh
+
+      - name: Upload DTBO zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: DTBO-S10
+          path: build/DTBO S10.zip
