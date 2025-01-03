@@ -4,6 +4,9 @@ export MODEL=$1
 export KSU=$2
 export KBUILD_BUILD_USER="@ravindu644"
 
+#init ksu next
+git submodule init && git submodule update
+
 #proton-12
 if [ ! -d "${RDIR}/proton" ]; then
     mkdir -p "${RDIR}/proton"
