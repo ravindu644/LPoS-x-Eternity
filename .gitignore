@@ -1,0 +1,44 @@
+# Ignore object files, binaries, and kernel modules
+*.o
+*.ko
+*.mod.*
+*.cmd
+*.symtypes
+*.order
+*.bin
+*.elf
+*.map
+# Ignore kernel configuration files
+.config
+.config.old
+Module.symvers
+# Ignore temporary files and logs
+*.log
+*.tmp
+*.bak
+*~
+*.swp
+*.swo
+# Ignore generated files from building the kernel
+/arch/*/boot/*
+/arch/*/boot/compressed/*
+/arch/*/boot/dts/*.dtb
+/arch/*/boot/dts/*.dtbo
+/arch/*/boot/dts/*.dtb.S
+# Ignore output directories
+/build/
+/out/
+/output/
+/*.dtb
+# Ignore patches and quilt files
+*.patch
+*.diff
+# Ignore cscope and other IDE files
+cscope.*
+tags
+.vscode/
+.idea/
+
+#patch files
+*.orig
+*.rej
