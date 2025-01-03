@@ -135,27 +135,24 @@ build_zip() {
 }
 
 # Main execution
-rm -rf ./build.log
-(
-    START_TIME=$(date +%s)
 
-    if [ "$KSU" = "non-ksu" ]; then
-        echo "CONFIG_KSU=n" > "${RDIR}/arch/arm64/configs/ksu.config"
-        build_kernel "eternity.config ksu.config"
-    elif [ "$KSU" = "ksu" ]; then
-        echo "CONFIG_KSU=y" > "${RDIR}/arch/arm64/configs/ksu.config"
-        build_kernel "eternity.config ksu.config"
-    else
-        echo "Error: Invalid input. Please enter 'ksu' or 'non-ksu' as the 2nd parameter"
-        exit 1
-    fi
+START_TIME=$(date +%s)
 
-    build_dtbo
-    build_ramdisk
-    build_zip
+if [ "$KSU" = "non-ksu" ]; then
+    echo "CONFIG_KSU=n" > "${RDIR}/arch/arm64/configs/ksu.config"
+    build_kernel "eternity.config ksu.config"
+elif [ "$KSU" = "ksu" ]; then
+    echo "CONFIG_KSU=y" > "${RDIR}/arch/arm64/configs/ksu.config"
+    build_kernel "eternity.config ksu.config"
+else
+    echo "Error: Invalid input. Please enter 'ksu' or 'non-ksu' as the 2nd parameter"
+    exit 1
+fi
 
-    END_TIME=$(date +%s)
-    ELAPSED_TIME=$((END_TIME - START_TIME))
-    echo "Total compile time was $ELAPSED_TIME seconds"
+build_dtbo
+build_ramdisk
+build_zip
 
-) 2>&1 | tee -a ./build.log
+END_TIME=$(date +%s)
+ELAPSED_TIME=$((END_TIME - START_TIME))
+echo "Total compile time was $ELAPSED_TIME seconds"
