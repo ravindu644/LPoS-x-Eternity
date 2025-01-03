@@ -32,6 +32,27 @@ LLVM_DIS=llvm-dis
 LLVM_NM=llvm-nm
 LLVM=1
 "
+
+KSU_FLAGS="
+CONFIG_KSU=y \n
+CONFIG_KSU_SUSFS=y \n
+CONFIG_KSU_SUSFS_SUS_SU=n \n
+CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y \n
+CONFIG_KSU_SUSFS_SUS_PATH=n \n
+CONFIG_KSU_SUSFS_SUS_MOUNT=y \n
+CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y \n
+CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y \n
+CONFIG_KSU_SUSFS_SUS_KSTAT=y \n
+CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y \n
+CONFIG_KSU_SUSFS_TRY_UMOUNT=y \n
+CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y \n
+CONFIG_KSU_SUSFS_SPOOF_UNAME=y \n
+CONFIG_KSU_SUSFS_ENABLE_LOG=y \n
+CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y \n
+CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y \n
+CONFIG_KSU_SUSFS_OPEN_REDIRECT=y
+"
+
 #symlinking python2
 if [ ! -f "$HOME/python" ]; then
     ln -s /usr/bin/python2.7 "$HOME/python"
@@ -139,10 +160,10 @@ build_zip() {
 START_TIME=$(date +%s)
 
 if [ "$KSU" = "non-ksu" ]; then
-    echo "CONFIG_KSU=n" > "${RDIR}/arch/arm64/configs/ksu.config"
+    echo -e "CONFIG_KSU=n\nCONFIG_KSU_SUSFS=n" > "${RDIR}/arch/arm64/configs/ksu.config"
     build_kernel "eternity.config ksu.config"
 elif [ "$KSU" = "ksu" ]; then
-    echo "CONFIG_KSU=y" > "${RDIR}/arch/arm64/configs/ksu.config"
+    echo -e "${KSU_FLAGS}" > "${RDIR}/arch/arm64/configs/ksu.config"
     build_kernel "eternity.config ksu.config"
 else
     echo "Error: Invalid input. Please enter 'ksu' or 'non-ksu' as the 2nd parameter"
