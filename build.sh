@@ -35,10 +35,6 @@ LLVM_DIS=llvm-dis
 LLVM_NM=llvm-nm
 LLVM=1
 "
-#symlinking python2
-if [ ! -f "$HOME/python" ]; then
-    ln -s /usr/bin/python2.7 "$HOME/python"
-fi 
 
 # Device configuration
 declare -A DEVICES=(
