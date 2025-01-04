@@ -66,7 +66,7 @@ build_kernel() {
     export PLATFORM_VERSION=11
     export ANDROID_MAJOR_VERSION=r
 
-    make -j$(nproc) ARCH=arm64 ${ARGS} $KERNEL_DEFCONFIG $config || exit -1
+    make -j$(nproc) ARCH=arm64 ${ARGS} $KERNEL_DEFCONFIG $config version.config || exit -1
     make -j$(nproc) ARCH=arm64 ${ARGS} menuconfig || true
     make -j$(nproc) ARCH=arm64 ${ARGS} || exit -1
 
