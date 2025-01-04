@@ -56,11 +56,6 @@ CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y \n
 CONFIG_KSU_SUSFS_OPEN_REDIRECT=y
 "
 
-#symlinking python2
-if [ ! -f "$HOME/python" ]; then
-    ln -s /usr/bin/python2.7 "$HOME/python"
-fi 
-
 # Device configuration
 declare -A DEVICES=(
     [beyond2lte]="exynos9820-beyond2lte_defconfig 9820 SRPRI17C014KU"
