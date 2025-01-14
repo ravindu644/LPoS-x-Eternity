@@ -13,6 +13,14 @@ if [ ! -d "${RDIR}/proton" ]; then
     git clone --depth=1 https://github.com/ravindu644/proton-12.git -b main --single-branch proton
 fi
 
+#install requirements
+sudo apt update -y
+sudo apt install default-jdk git gnupg flex bison gperf build-essential zip curl \
+libc6-dev libncurses-dev libx11-dev libreadline-dev libgl1 libgl1-mesa-dev \
+python3 make sudo gcc g++ bc grep tofrodos python3-markdown libxml2-utils xsltproc \
+zlib1g-dev python-is-python3 libc6-dev libtinfo6 make cpio kmod openssl \
+libelf-dev libssl-dev -y
+
 export PATH=$PWD/proton/bin:$PATH
 export READELF=$PWD/proton/bin/aarch64-linux-gnu-readelf
 export LLVM=1
