@@ -23,12 +23,11 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Install packages & setup
+      - name: Set up build environment
         run: |
           sudo apt update -y  
-          sudo apt install libncurses5-dev python2 libtinfo5 -y    
-          git clone --depth=1 https://github.com/ravindu644/proton-12.git -b main --single-branch proton
-          export PATH=$PWD/proton/bin:$PATH  
+          sudo apt install libncurses5-dev -y
+          wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb
           
       - name: Set environment variable
         run: |
