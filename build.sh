@@ -1,8 +1,13 @@
 #!/bin/bash
+
 RDIR=$(pwd)
 export MODEL=$1
-export KSU=$2
 export KBUILD_BUILD_USER="@ravindu644"
+
+#OEM variabls
+export ARCH=arm64
+export PLATFORM_VERSION=12
+export ANDROID_MAJOR_VERSION=s
 
 #init ksu next
 git submodule init && git submodule update
@@ -13,47 +18,31 @@ if [ ! -d "${RDIR}/proton" ]; then
     git clone --depth=1 https://github.com/ravindu644/proton-12.git -b main --single-branch proton
 fi
 
-export PATH=$PWD/proton/bin:$PATH
-export READELF=$PWD/proton/bin/aarch64-linux-gnu-readelf
-export LLVM=1
-export ARGS="
-CC=clang
-LD=ld.lld
-ARCH=arm64
-CROSS_COMPILE=aarch64-linux-gnu-
-CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-CLANG_TRIPLE=aarch64-linux-gnu-
-AR=llvm-ar
-NM=llvm-nm
-AS=llvm-as
-OBJCOPY=llvm-objcopy
-OBJDUMP=llvm-objdump
-OBJSIZE=llvm-size
-STRIP=llvm-strip
-LLVM_AR=llvm-ar
-LLVM_DIS=llvm-dis
-LLVM_NM=llvm-nm
-LLVM=1
-"
+#export toolchain paths
+export BUILD_CROSS_COMPILE="${RDIR}/proton/bin/aarch64-linux-gnu-"
+export BUILD_CROSS_COMPILE_ARM32="${RDIR}/proton/bin/arm-linux-gnueabi-"
+export BUILD_CC="${RDIR}/proton/bin/clang"
+export PATH=$PATH:"${RDIR}/proton/bin"
 
-KSU_FLAGS="
-CONFIG_KSU=y \n
-CONFIG_KSU_SUSFS=y \n
-CONFIG_KSU_SUSFS_SUS_SU=n \n
-CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y \n
-CONFIG_KSU_SUSFS_SUS_PATH=n \n
-CONFIG_KSU_SUSFS_SUS_MOUNT=y \n
-CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y \n
-CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y \n
-CONFIG_KSU_SUSFS_SUS_KSTAT=y \n
-CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y \n
-CONFIG_KSU_SUSFS_TRY_UMOUNT=y \n
-CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y \n
-CONFIG_KSU_SUSFS_SPOOF_UNAME=y \n
-CONFIG_KSU_SUSFS_ENABLE_LOG=y \n
-CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y \n
-CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y \n
-CONFIG_KSU_SUSFS_OPEN_REDIRECT=y
+#build options
+export ARGS="
+-j$(nproc) \
+ARCH=arm64 \
+CROSS_COMPILE=${BUILD_CROSS_COMPILE} \
+CROSS_COMPILE_ARM32=${BUILD_CROSS_COMPILE_ARM32} \
+CC=${BUILD_CC} \
+CLANG_TRIPLE=${BUILD_CROSS_COMPILE} \
+LLVM=1 \
+LLVM_IAS=1 \
+AR=${RDIR}/proton/bin/llvm-ar \
+NM=${RDIR}/proton/bin/llvm-nm \
+LD=${RDIR}/proton/bin/ld.lld \
+STRIP=${RDIR}/proton/bin/llvm-strip \
+OBJCOPY=${RDIR}/proton/bin/llvm-objcopy \
+OBJDUMP=${RDIR}/proton/bin/llvm-objdump \
+READELF=${RDIR}/proton/bin/llvm-readelf \
+HOSTCC=${RDIR}/proton/bin/clang \
+HOSTCXX=${RDIR}/proton/bin/clang++ \
 "
 
 # Device configuration
@@ -68,8 +57,8 @@ declare -A DEVICES=(
 if [[ -v DEVICES[$MODEL] ]]; then
     read KERNEL_DEFCONFIG SOC BOARD <<< "${DEVICES[$MODEL]}"
 else
-    echo "Unknown device: $MODEL, setting to beyond2lte"
-    read KERNEL_DEFCONFIG SOC BOARD <<< "${DEVICES[beyond2lte]}"
+    echo "Unknown device: $MODEL, setting to beyondx"
+    read KERNEL_DEFCONFIG SOC BOARD <<< "${DEVICES[beyondx]}"
 fi
 
 #dev
@@ -83,14 +72,12 @@ echo -e "CONFIG_LOCALVERSION_AUTO=n\nCONFIG_LOCALVERSION=\"-LPoS-x-Eternity-${LP
 build_kernel() {
     local config=$1
     echo "Starting a kernel build using $KERNEL_DEFCONFIG"
-    export PLATFORM_VERSION=11
-    export ANDROID_MAJOR_VERSION=r
 
-    make -j$(nproc) ARCH=arm64 ${ARGS} $KERNEL_DEFCONFIG $config version.config || exit -1
-    make -j$(nproc) ARCH=arm64 ${ARGS} menuconfig || true
-    make -j$(nproc) ARCH=arm64 ${ARGS} || exit -1
+    make ${ARGS} $KERNEL_DEFCONFIG eternity.config ksu.config version.config || exit 1
+    make ${ARGS} menuconfig || true
+    make ${ARGS} || exit 1
 
-    $RDIR/toolchains/mkdtimg cfg_create build/dtb_$SOC.img $RDIR/toolchains/configs/exynos$SOC.cfg -d $RDIR/arch/arm64/boot/dts/exynos
+    ${RDIR}/toolchains/mkdtimg cfg_create build/dtb_$SOC.img $RDIR/toolchains/configs/exynos$SOC.cfg -d $RDIR/arch/arm64/boot/dts/exynos
     echo "Finished kernel build"
 }
 
@@ -118,13 +105,12 @@ build_ramdisk() {
     echo $BOARD > ramdisk/split_img/boot.img-board
     mkdir -p $RDIR/ramdisk/ramdisk/{debug_ramdisk,dev,mnt,proc,sys}
 
-    rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9820
-    rm -rf $RDIR/ramdisk/ramdisk/fstab.exynos9825
+    rm -rf "${RDIR}/ramdisk/ramdisk"/fstab*
 
     cp $RDIR/ramdisk/fstab.exynos9820 $RDIR/ramdisk/ramdisk/fstab.exynos$SOC
 
     cd $RDIR/ramdisk/
-    ./repackimg.sh --nosudo
+    sudo bash repackimg.sh
 }
 
 build_zip() {
@@ -157,17 +143,7 @@ build_zip() {
 
 START_TIME=$(date +%s)
 
-if [ "$KSU" = "non-ksu" ]; then
-    echo -e "CONFIG_KSU=n\nCONFIG_KSU_SUSFS=n" > "${RDIR}/arch/arm64/configs/ksu.config"
-    build_kernel "eternity.config ksu.config"
-elif [ "$KSU" = "ksu" ]; then
-    echo -e "${KSU_FLAGS}" > "${RDIR}/arch/arm64/configs/ksu.config"
-    build_kernel "eternity.config ksu.config"
-else
-    echo "Error: Invalid input. Please enter 'ksu' or 'non-ksu' as the 2nd parameter"
-    exit 1
-fi
-
+build_kernel
 build_dtbo
 build_ramdisk
 build_zip

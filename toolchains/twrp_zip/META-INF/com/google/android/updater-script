@@ -15,15 +15,14 @@ ui_print "*      by @ravindu644         *"
 ui_print "*******************************"
 
 # Check bootloader version
-if [ "$(getprop ro.bootloader | cut -c 5)" = "N" ]; then
+if [ "$(getprop ro.bootloader | cut -c 5)" = "N" ] && [ -f dtbo_ks.img ]; then
     ui_print " "
     ui_print "Korean Device Detected..."
-    ui_print "[+] Installing Korean DTBO..."    
+    ui_print "[+] Installing Korean DTBO..."
     package_extract_file dtbo_ks.img "$(find_block dtbo)"
 else
     ui_print " "
-    ui_print "International Device Detected..."
-    ui_print "[+] Installing DTBO..."
+    ui_print "[+] Installing Generic DTBO..."
     package_extract_file dtbo.img "$(find_block dtbo)"
 fi
 
