@@ -15,7 +15,6 @@ jobs:
     strategy:
       matrix:
         device: [beyond2lte, beyond1lte, beyond0lte, beyondx]
-        su: [non-ksu, ksu]
 
     steps:
       - name: Checkout source
@@ -37,16 +36,12 @@ jobs:
           
       - name: Building LPoS
         run: |
-          if [ "${{ matrix.su }}" == "non-ksu" ]; then
-            bash build.sh ${{ matrix.device }} non-ksu
-          else
-            bash build.sh ${{ matrix.device }} ksu
-          fi
+            bash build.sh ${{ matrix.device }}
 
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
-          name: "LPoS-${{ env.LPOS_KERNEL_VERSION }}-${{ matrix.device }}-${{ matrix.su }}-universal"
+          name: "LPoS-${{ env.LPOS_KERNEL_VERSION }}-${{ matrix.device }}-ksu-universal"
           path: |
             build/*.zip
 
