@@ -47,18 +47,37 @@ HOSTCXX=${RDIR}/proton/bin/clang++ \
 
 # Device configuration
 declare -A DEVICES=(
-    [beyond2lte]="exynos9820-beyond2lte_defconfig 9820 SRPRI17C014KU"
-    [beyond1lte]="exynos9820-beyond1lte_defconfig 9820 SRPRI28B014KU"
-    [beyond0lte]="exynos9820-beyond0lte_defconfig 9820 SRPRI28A014KU"
-    [beyondx]="exynos9820-beyondx_defconfig 9820 SRPSC04B011KU"
+    [beyond2]="exynos9820-beyond2_defconfig 9820 SRPRI17C014KU S"
+    [beyond1]="exynos9820-beyond1_defconfig 9820 SRPRI28B014KU S"
+    [beyond0]="exynos9820-beyond0_defconfig 9820 SRPRI28A014KU S"
+    [beyondxks]="exynos9820-beyondxks_defconfig 9820 SRPSC04B011KU S"
+    [d1]="exynos9825-d1_defconfig 9825 SRPSD26B009KU N"
+    [d2s]="exynos9825-d2s_defconfig 9825 SRPSC14B009KU N"
+    [d1x]="exynos9820-d1xks_defconfig 9825 SRPSD23A002KU N"
+    [d2x]="exynos9820-d2x_defconfig 9825 SRPSC14C007KU N"
 )
 
 # Set device-specific variables
 if [[ -v DEVICES[$MODEL] ]]; then
-    read KERNEL_DEFCONFIG SOC BOARD <<< "${DEVICES[$MODEL]}"
+    read KERNEL_DEFCONFIG SOC BOARD PHONE <<< "${DEVICES[$MODEL]}"
+    echo -e "[!] Building a KernelSU enabled kernel for ${MODEL}...\n"
 else
-    echo "Unknown device: $MODEL, setting to beyondx"
-    read KERNEL_DEFCONFIG SOC BOARD <<< "${DEVICES[beyondx]}"
+    echo "Unknown device: $MODEL, setting to beyondxks"
+    export MODEL="beyondxks"
+    read KERNEL_DEFCONFIG SOC BOARD PHONE <<< "${DEVICES[beyondxks]}"
+fi
+
+# tzdev
+rm -rf "${RDIR}/drivers/misc/tzdev"
+
+if [ "$PHONE" = "S" ]; then
+    echo "Using S tzdev driver"
+    cp -ar "${RDIR}/prebuilts/S/tzdev" "${RDIR}/drivers/misc/tzdev"
+
+elif [ "$PHONE" = "N" ]; then
+    echo "Using N tzdev driver"
+    cp -ar "${RDIR}/prebuilts/N/tzdev" "${RDIR}/drivers/misc/tzdev"
+
 fi
 
 #dev
