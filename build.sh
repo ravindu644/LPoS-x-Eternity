@@ -153,7 +153,7 @@ build_zip() {
     
     cp -r "${RDIR}/toolchains/twrp_zip/"* "${RDIR}/build/zip/"
     cd $RDIR/build/zip
-    zip -r ../LPoS-x-Eternity-${LPOS_KERNEL_VERSION}-${MODEL}-${KSU}-universal.zip .
+    zip -r ../LPoS-x-Eternity-${LPOS_KERNEL_VERSION}-${MODEL}-universal.zip .
     rm -rf $RDIR/build/zip
     cd $RDIR/build
 }
