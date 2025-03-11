@@ -136,6 +136,12 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
 	if (sscanf(page, "%d", &new_value) != 1)
 		goto out;
 
+#ifdef CONFIG_SECURITY_SELINUX_ALWAYS_ENFORCE
+ 	new_value = 1;
+#elif defined(CONFIG_SECURITY_SELINUX_ALWAYS_PERMISSIVE)
+ 	new_value = 0;
+#endif
+
 	if (new_value != selinux_enforcing) {
 		length = avc_has_perm(current_sid(), SECINITSID_SECURITY,
 				      SECCLASS_SECURITY, SECURITY__SETENFORCE,
